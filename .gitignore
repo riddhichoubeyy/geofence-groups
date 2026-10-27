@@ -1,0 +1,27 @@
+*.iml
+.gradle/
+build/
+local.properties
+.idea/
+captures/
+.externalNativeBuild/
+.cxx/
+app/google-services.json
+functions/node_modules/
+functions/lib/
+.firebaserc
+firebase-debug.log
+*.log
+
+# Secrets and signing material — never commit
+*.jks
+*.keystore
+keystore.properties
+service-account*.json
+*-adminsdk-*.json
+serviceAccount*.json
+.env
+.env.*
+functions/.env*
+.runtimeconfig.json
+!app/google-services.json.example

@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isMember(g) {
+      return signedIn() &&
+        request.auth.uid in get(/databases/$(database)/documents/groups/$(g)).data.memberUids;
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['displayName', 'email', 'createdAt']);
+      // Push tokens: only the owner can touch them; the Admin SDK (Functions) reads them to send alerts.
+      match /devices/{token} {
+        allow read, delete: if signedIn() && request.auth.uid == uid;
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['updatedAt']);
+      }
+    }
+
+    // All writes to groups/members/events/inviteCodes happen only via Cloud Functions (Admin SDK).
+    match /groups/{g} {
+      allow read: if signedIn() && request.auth.uid in resource.data.memberUids;
+      allow write: if false;
+      match /members/{m} { allow read: if isMember(g); allow write: if false; }
+      match /events/{e}  { allow read: if isMember(g); allow write: if false; }
+      match /private/{doc} { allow read, write: if false; }
+    }
+    match /inviteCodes/{c} { allow read, write: if false; }
+  }
+}

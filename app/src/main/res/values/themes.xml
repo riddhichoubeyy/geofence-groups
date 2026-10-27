@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.GeofenceGroups" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/orbit_paper</item>
+    </style>
+</resources>
